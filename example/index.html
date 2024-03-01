@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>kostix.dev</title>
+
+    <style>
+      /* initial stuff */
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #000000;
+        overflow: hidden;
+        font-family: monospace;
+      }
+      /*
+      * stats
+      */
+      .stats-dom {
+        display: flex;
+      }
+      .stats-dom.stats-hidden {
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      .stats-dom.stats-shown {
+        opacity: 1 !important;
+        pointer-events: all !important;
+        display: flex;
+        position: absolute !important;
+        /* right: 0 !important; */
+        left: initial !important;
+      }
+      .stats-dom.stats-shown canvas{
+        display: inline-block !important;
+      }
+    </style>
+    
+  </head>
+  <body>
+
+    <canvas id="mathreeq"></canvas>
+    
+  </body>
+</html>

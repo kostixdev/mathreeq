@@ -1,0 +1,15 @@
+.DS_Store
+
+.vscode
+.history
+
+node_modules
+
+coverage
+
+.readmeqBackups
+
+build
+dist
+
+docs

@@ -1,0 +1,6 @@
+
+class EventDetector {
+  constructor() {
+    // ...
+  }
+}

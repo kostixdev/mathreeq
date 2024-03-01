@@ -1,0 +1,46 @@
+{
+  "name": "mathreeq",
+  "version": "1.0.0",
+  "description": "Matrix digital rain project",
+  "main": "src/index.ts",
+  "scripts": {
+    "develop": "webpack-dev-server --mode development",
+    "build": "webpack --mode production",
+    "docs": "typedoc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kostixdev/mathreeq.git"
+  },
+  "keywords": [
+    "matrix",
+    "digital",
+    "rain",
+    "three.js"
+  ],
+  "author": "kostix.dev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kostixdev/mathreeq/issues"
+  },
+  "homepage": "https://github.com/kostixdev/mathreeq#readme",
+  "dependencies": {
+    "hellpeq": "^1.0.1",
+    "intervaq": "^2.1.2"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.22.10",
+    "@types/three": "^0.161.2",
+    "copy-webpack-plugin": "^12.0.2",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.6.0",
+    "three": "^0.161.0",
+    "ts-loader": "^9.5.1",
+    "typedoc": "^0.25.8",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "write-file-webpack-plugin": "^4.5.1"
+  }
+}
