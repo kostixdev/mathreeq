@@ -25,12 +25,14 @@ So it should stop moving and allow me to make click on it with its own callback.
 
 All this stuff I did as it is. Without any reason to be perfect. That just works good anough.
 
-But still, a good recommendation to improve, modify or optimize - wellcome to [issues](/issues/).
+But still, a good recommendation to improve, modify or optimize - wellcome to [issues](https://github.com/kostixdev/mathreeq/issues).
 
 
 ## Example:
 
-`npm run develop` and go play with [example](/example/) at localhost:4000.
+- `npm install` - because
+- `nvm use` - chck [nvm](https://github.com/nvm-sh/nvm) node v20.11.0 at [`.nvmrc`](.nvmrc)
+- `npm run develop` temp stuff, run and go play with [example](/example/) at localhost:4000.
 
 Thats all at this moment. 
 

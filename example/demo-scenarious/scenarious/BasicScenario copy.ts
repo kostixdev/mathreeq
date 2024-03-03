@@ -1,9 +1,9 @@
 import { Interval, Intervaq, Timeout } from "intervaq";
-import { MathreeqScenario } from "../../src/classes/MathreeqScenario";
-import { LineGroup, Mathreeq } from "../../src";
-import { AreaTool } from "../../src/libs/ThreeJsTools.lib";
+import { MathreeqScenario } from "../../../src/classes/MathreeqScenario";
+import { LineGroup, Mathreeq } from "../../../src";
+import { AreaTool } from "../../../src/libs/ThreeJsTools.lib";
 import { getRandomIntArbitrary, getRandomItemFromArray } from "hellpeq";
-import THREE = require("three");
+import * as THREE from "three";
 
 /**
  * Types

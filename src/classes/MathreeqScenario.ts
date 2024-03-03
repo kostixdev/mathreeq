@@ -17,11 +17,20 @@ export class MathreeqScenario<T> {
   }
 
   run(): void {
-
+    
   }
 
   stop(): void {
 
+  }
+
+  restart(): void {
+    this.stop();
+    this.run();
+  }
+
+  setOption(key: string, value: any): boolean {
+    return true;
   }
 
   destroy(): void {

@@ -16,8 +16,10 @@ import { Interval, Intervaq } from 'intervaq';
 import { LineGroup, Mathreeq, MathreeqOptions, TextStyleParams } from '../src';
 import { AreaTool, ParallaxTool, ParallaxToolOptions } from '../src/libs/ThreeJsTools.lib';
 import { HoverDetector } from '../src/classes/HoverDetector';
-import { TagsScenario } from './mathreeq-scenarious/TagsScenario';
-import { BlankScenario } from './mathreeq-scenarious/BlankScenario';
+
+import { ScenarioHub } from './demo-scenarious/ScenarioHub';
+import { BasicScenario } from './demo-scenarious/scenarious/BasicScenario';
+import { TagsScenario } from './demo-scenarious/scenarious/TagsScenario';
 
 
 
@@ -47,6 +49,8 @@ let INTERVAQ: Intervaq;
 let mathreeqFont: Font;
 
 let MATHREEQ: Mathreeq;
+
+let scenarioHub: ScenarioHub;
 
 // #TODO: bad feature. finish it.
 let intersectedHoverDetectorEnabled: boolean = true;
@@ -260,6 +264,12 @@ const disappearOptions = {
   },
 };
 
+// - - scenarious stuff
+const mathreeqScenario = {
+  scenario: 'off',
+  delay: 150,
+};
+
 
 
 
@@ -337,6 +347,7 @@ const helpers: MathreeqHelpers = {
  *****************************************************************************/
 
 //#TODO: ... keys
+// - init speicfic helper
 const initHelper = (helperKey: string): void => {
   switch (helperKey) {
     case 'axesHelper': {
@@ -373,6 +384,7 @@ const initHelper = (helperKey: string): void => {
   }
 }
 
+// - all helpers init
 const initHelpers = (): void => {
   // - - display axes (x, y, z)
   initHelper('axesHelper');
@@ -397,6 +409,31 @@ const initStats = (): void => {
   // stats.dom.classList.add('stats-hidden');
   stats.dom.classList.add('stats-shown');
 };
+
+
+
+const initMathreeqScenarious = (): void => {
+  scenarioHub = new ScenarioHub();
+
+  const basicScenario = new BasicScenario('basic', MATHREEQ, {
+    delayMs: mathreeqScenario.delay,
+    areaToolAppear: areaToolAppear,
+    areaToolDisappear: areaToolDisappear,
+    areaPointStep: textStyleParams.size
+  });
+  scenarioHub.registerScenario(basicScenario);
+
+  const tagsScenario = new TagsScenario('tags', MATHREEQ, {
+    delayMs: mathreeqScenario.delay,
+    tags: tagsArr,
+    areaToolAppear: areaToolAppear,
+    areaToolDisappear: areaToolDisappear,
+    areaPointStep: textStyleParams.size
+  });
+  scenarioHub.registerScenario(tagsScenario);
+}
+
+
 
 // - GUI init
 const initGui = (): void => {
@@ -434,99 +471,37 @@ const initGui = (): void => {
   areaToolDisappear.appendGuiFolder(gui, 'areaDisappearBoxTool', scene, render);
   areaToolDisappear.closeGuiFolder();
 
-  // - - 
-  GUI_addFolder_mathreexFolder(true);
-
+  // - - mathreeq stuff
+  GUI_addFolder_mathreeqFolder(true);
 };
 
-function GUI_addFolder_mathreexFolder(open: boolean) {
-  const mathreexFolder = gui.addFolder('Mathreeq actions');
-
-  const mathreeqScenario = {
-    scenario: 'off',
-    delay: 150,
-  };
-
-  const tagsScenario = new TagsScenario('tags', MATHREEQ, {
-    delayMs: mathreeqScenario.delay,
-    tags: tagsArr,
-    areaToolAppear: areaToolAppear,
-    areaToolDisappear: areaToolDisappear,
-    areaPointStep: textStyleParams.size
-  });
-
-  const blankScenario = new BlankScenario('blank', MATHREEQ, {
-    delayMs: mathreeqScenario.delay,
-    areaToolAppear: areaToolAppear,
-    areaToolDisappear: areaToolDisappear,
-    areaPointStep: textStyleParams.size
-  });
+function GUI_addFolder_mathreeqFolder(open: boolean) {
+  const mathreeqFolder = gui.addFolder('Mathreeq actions');
 
   const scenarious = [
     'off',
-    'blankDefault',
-    'blankStopMooving',
-    'blankLineByLine',
-    'blankLineScreen',
-    'tagsDefault',
-    'tagsStopMooving',
-    'tagsHoverClick',
-    'tagsLineByLine'
+    'basic',
+    // 'basicStopMooving',
+    // 'basicLineByLine',
+    // 'basicLineScreen',
+    'tags',
+    // 'tagsStopMooving',
+    // 'tagsHoverClick',
+    // 'tagsLineByLine'
   ];
 
-  mathreexFolder.add(mathreeqScenario, 'scenario', scenarious).name('scenario').onChange(function(value: string){
+  mathreeqFolder.add(mathreeqScenario, 'scenario', scenarious).name('scenario').onChange(function(value: string){
     switch(value) {
       case 'off': {
-        blankScenario.stop();
-        tagsScenario.stop();
+        scenarioHub.stopScenario();
         break;
       }
-      case 'blankDefault': {
-        tagsScenario.stop();
-        blankScenario.applyConfig('default');
-        blankScenario.run();
+      case 'basic': {
+        scenarioHub.runScenario('basic');
         break;
       }
-      case 'blankStopMooving': {
-        tagsScenario.stop();
-        blankScenario.applyConfig('stopMooving');
-        blankScenario.run();
-        break;
-      }
-      case 'blankLineByLine': {
-        tagsScenario.stop();
-        blankScenario.applyConfig('lineByLine');
-        blankScenario.run();
-        break;
-      }
-      case 'blankLineScreen': {
-        tagsScenario.stop();
-        blankScenario.applyConfig('lineScreen');
-        blankScenario.run();
-        break;
-      }
-      case 'tagsDefault': {
-        blankScenario.stop();
-        tagsScenario.applyConfig('default');
-        tagsScenario.run();
-        break;
-      }
-      case 'tagsStopMooving': {
-        blankScenario.stop();
-        tagsScenario.applyConfig('stopMooving');
-        tagsScenario.run();
-        break;
-      }
-      case 'tagsHoverClick': {
-        blankScenario.stop();
-        tagsScenario.applyConfig('hoverClick');
-        tagsScenario.run();
-        break;
-      }
-      case 'tagsLineByLine': {
-        blankScenario.stop();
-        tagsScenario.applyConfig('lineByLine');
-        tagsScenario.run();
+      case 'tags': {
+        scenarioHub.runScenario('tags');
         break;
       }
       default: {
@@ -534,14 +509,13 @@ function GUI_addFolder_mathreexFolder(open: boolean) {
       }
     }
   });
-  mathreexFolder.add(mathreeqScenario, 'delay', 10, 500, 1).name('delayMs').onChange(function(value: number){
-    blankScenario.setDelay(value);
-    tagsScenario.setDelay(value);
+  mathreeqFolder.add(mathreeqScenario, 'delay', 10, 500, 1).name('delayMs').onChange(function(value: number){
+    scenarioHub.setScenarioOption('delayMs', value, true);
   });
 
   (open) 
-    ? mathreexFolder.open() 
-    : mathreexFolder.close();
+    ? mathreeqFolder.open() 
+    : mathreeqFolder.close();
 }
 
 function GUI_addFolder_helpersFolder(open: boolean) {
@@ -765,6 +739,7 @@ const initReady = new Promise((resolve, reject) => {
   // - MATHREEQ
   mathreqReady.then(() => {
     // #TODO: because of using mathreeq... refac
+    initMathreeqScenarious();
     initGui();
     addEventListeners();
     resolve(true);

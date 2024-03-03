@@ -1,9 +1,9 @@
+import * as THREE from "three";
 import { Interval, Intervaq } from "intervaq";
-import { MathreeqScenario } from "../../src/classes/MathreeqScenario";
-import { LineGroup, Mathreeq } from "../../src";
-import { AreaTool } from "../../src/libs/ThreeJsTools.lib";
+import { MathreeqScenario } from "../../../src/classes/MathreeqScenario";
+import { LineGroup, Mathreeq } from "../../../src";
+import { AreaTool } from "../../../src/libs/ThreeJsTools.lib";
 import { getRandomIntArbitrary, getRandomItemFromArray } from "hellpeq";
-import THREE = require("three");
 
 /**
  * Types
@@ -132,17 +132,8 @@ export class TagsScenario extends MathreeqScenario<TagsScenarioOptions> {
     };
     const lineTextOptions_hover_onClick = (lineGroup: LineGroup): void => {
       console.log({'onClick' : lineGroup.lineTextParams.text});
-      alert(lineGroup.lineTextParams.text);
-      // intersectedHoverDetectorEnabled = false;
-      // lineGroup.onHoverOut();
-      // intersectedHoverDetector = null;
-      // lineGroup.execution?.moving?.setDuration(1);
-      // MATHREEQ?.lineGroups.forEach((lg: LineGroup) => {
-      //   lg.execution?.moving?.setDuration(1);
-      // })
-      // setTimeout(() => {
-      //   intersectedHoverDetectorEnabled = true;
-      // }, 1000);
+      // alert(lineGroup.lineTextParams.text);
+      window.open('https://kostix.dev?tag='+lineGroup.lineTextParams.text, '_blank');
     };
 
     // - lineGroup options
