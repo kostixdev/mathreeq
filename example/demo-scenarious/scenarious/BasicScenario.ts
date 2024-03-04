@@ -12,10 +12,24 @@ import * as THREE from "three";
  */
 
 export interface BasicScenarioOptions {
+  tags: string[];
+  renderTags: boolean;
+  clickOnTags: boolean;
   delayMs: number;
   areaToolAppear: AreaTool;
   areaToolDisappear: AreaTool;
   areaPointStep: number;
+  lineGroupSizeMin: number;
+  lineGroupSizeMax: number;
+  lineGroupAppendSpeedMin: number;
+  lineGroupAppendSpeedMax: number;
+  lineGroupFade: boolean;
+  lineGroupMove: boolean;
+  lineGroupMoveDirection: string;
+  lineGroupMoveBackward: boolean;
+  lineGroupMoveDurationMsMin: number;
+  lineGroupMoveDurationMsMax: number;
+  cellItemLifetimeMs: number;
 }
 
 
@@ -48,31 +62,69 @@ export class BasicScenario extends MathreeqScenario<BasicScenarioOptions> {
   }
 
   getPositionToAppear(): THREE.Vector3 {
+    if (this.options.lineGroupMoveBackward)
+      return this.options.areaToolDisappear.getRandomPointWithStep(this.options.areaPointStep);
     return this.options.areaToolAppear.getRandomPointWithStep(this.options.areaPointStep);
+  }
+
+  getPositionToDisappear(): THREE.Vector3 {
+    if (this.options.lineGroupMoveBackward)
+      return this.options.areaToolAppear.getRandomPointWithStep(this.options.areaPointStep);
+    return this.options.areaToolDisappear.getRandomPointWithStep(this.options.areaPointStep);
+  }
+
+  getPositionDelta(positionToAppear: THREE.Vector3, positionToDisappear: THREE.Vector3): THREE.Vector3 {
+    switch(this.options.lineGroupMoveDirection) {
+      case 'xAxis': {
+        return new THREE.Vector3(
+          positionToDisappear.x - positionToAppear.x,
+          0,
+          0
+        );
+      }
+      case 'yAxis': {
+        return new THREE.Vector3(
+          0,
+          positionToDisappear.y - positionToAppear.y,
+          0
+        );
+      }
+      case 'zAxis': {
+        return new THREE.Vector3(
+          0,
+          0,
+          positionToDisappear.z - positionToAppear.z
+        );
+      }
+      default: {
+        return new THREE.Vector3(
+          positionToDisappear.x - positionToAppear.x,
+          positionToDisappear.y - positionToAppear.y,
+          positionToDisappear.z - positionToAppear.z
+        );
+      }
+    }
   }
 
   runRandomTag(): void {
 
     // - point to appear
     const positionToAppear = this.getPositionToAppear();
-    const x = positionToAppear.x;
-    const y = positionToAppear.y;
-    const z = positionToAppear.z;
 
-    // - delta to disappear
-    const positionToDisappear = this.options.areaToolDisappear.getRandomPointWithStep(this.options.areaPointStep);
-    const positionDelta = {
-      x: 0,
-      y: 0,
-      z: positionToDisappear.z - positionToAppear.z
-    };
+    // - point to disappear
+    const positionToDisappear = this.getPositionToDisappear();
+
+    // - delta to move
+    const positionDelta = this.getPositionDelta(positionToAppear, positionToDisappear);
 
     // - lineText options
-    const lineTextOptions_text = '';// getRandomItemFromArray(this.options.tags).toUpperCase();
-    const lineTextOptions_indexToAppear = getRandomIntArbitrary(5, 20);
+    const lineTextOptions_text = (this.options.renderTags) 
+      ? getRandomItemFromArray(this.options.tags).toUpperCase()
+      : '';
+    const lineTextOptions_indexToAppear = getRandomIntArbitrary(1, 5);
     const lineTextOptions_lifeTime = 5000;
-    const lineTextOptions_fade = true;//getRandomBoolean();
-    const lineTextOptions_hover_enabled = false;
+    const lineTextOptions_fade = false;//getRandomBoolean();
+    const lineTextOptions_hover_enabled = this.options.clickOnTags;
     // const lineTextOptions_hover_onHoverIn = null;
     const lineTextOptions_hover_onHoverIn = (lineGroup: LineGroup): void => {
       lineGroup.onHoverInDefault();
@@ -83,34 +135,36 @@ export class BasicScenario extends MathreeqScenario<BasicScenarioOptions> {
       lineGroup.onHoverOutDefault();
       document.body.style.cursor = 'default';
     };
+    // const lineTextOptions_hover_onClick = null;
     const lineTextOptions_hover_onClick = (lineGroup: LineGroup): void => {
       console.log({'onClick' : lineGroup.lineTextParams.text});
       alert(lineGroup.lineTextParams.text);
     };
 
     // - lineGroup options
-    const lineGroup_size = lineTextOptions_text.length + getRandomIntArbitrary(20, 40);
-    const lineGroup_appendSpeed = getRandomIntArbitrary(10, 50);
-    const lineGroup_move_enabled = true;
+    const lineGroup_size = lineTextOptions_text.length + getRandomIntArbitrary(this.options.lineGroupSizeMin, this.options.lineGroupSizeMax);
+    const lineGroup_appendSpeed = getRandomIntArbitrary(this.options.lineGroupAppendSpeedMin, this.options.lineGroupAppendSpeedMax);
+    const lineGroup_fade = this.options.lineGroupFade;
+    const lineGroup_move_enabled = this.options.lineGroupMove;
     const lineGroup_move_toPositionDelta = positionDelta;
-    const lineGroup_move_duration = getRandomIntArbitrary(5, 8) * 1000;
+    const lineGroup_move_duration = getRandomIntArbitrary(this.options.lineGroupMoveDurationMsMin, this.options.lineGroupMoveDurationMsMax);
 
     // - cellItem options
     const cellItem_animationSppedArray =
       [100, 200, 200, 1000, 1000, 1000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000];
-    const cellItem_lifeTime = 3000;
-    const cellItem_fade = true;//getRandomBoolean();
+    const cellItem_lifeTime = this.options.cellItemLifetimeMs;
 
     // - execute via MATHREEQ
     this.mathreeq.executeLineGroup({
       position: {
-        x,
-        y,
-        z
+        x: positionToAppear.x,
+        y: positionToAppear.y,
+        z: positionToAppear.z,
       },
       lineGroupParams: {
         size: lineGroup_size,
         appendSpeed: lineGroup_appendSpeed,
+        fade: lineGroup_fade,
         move: {
           enabled: lineGroup_move_enabled,
           toPositionDelta: lineGroup_move_toPositionDelta,
@@ -119,8 +173,7 @@ export class BasicScenario extends MathreeqScenario<BasicScenarioOptions> {
       },
       cellItemParams: {
         animationSppedArray: cellItem_animationSppedArray,
-        lifeTime: cellItem_lifeTime,
-        fade: cellItem_fade
+        lifeTime: cellItem_lifeTime
       },
       lineTextParams: {
         text: lineTextOptions_text,
@@ -153,6 +206,97 @@ export class BasicScenario extends MathreeqScenario<BasicScenarioOptions> {
         }
         return true;
       }
+      case 'renderTags': {
+        this.options.renderTags = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'clickOnTags': {
+        this.options.clickOnTags = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupSizeMin': {
+        this.options.lineGroupSizeMin = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupSizeMax': {
+        this.options.lineGroupSizeMax = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupAppendSpeedMin': {
+        this.options.lineGroupAppendSpeedMin = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupAppendSpeedMax': {
+        this.options.lineGroupAppendSpeedMax = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupFade': {
+        this.options.lineGroupFade = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupMove': {
+        this.options.lineGroupMove = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupMoveDirection': {
+        this.options.lineGroupMoveDirection = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupMoveBackward': {
+        this.options.lineGroupMoveBackward = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupMoveDurationMsMin': {
+        this.options.lineGroupMoveDurationMsMin = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'lineGroupMoveDurationMsMax': {
+        this.options.lineGroupMoveDurationMsMax = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
+      case 'cellItemLifetimeMs': {
+        this.options.cellItemLifetimeMs = value;
+        if (this.actionInterval instanceof Interval) {
+          this.restart();
+        }
+        return true;
+      }
       default: {
         return false;
       }
@@ -162,5 +306,5 @@ export class BasicScenario extends MathreeqScenario<BasicScenarioOptions> {
   destroy(): void {
     
   }
-  
+
 };

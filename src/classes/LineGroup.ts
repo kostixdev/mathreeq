@@ -40,6 +40,7 @@ export interface LineTextHoverParams {
 export interface LineGroupParams {
   size: number;
   appendSpeed: number;
+  fade: boolean;
   move: LineMoveParams;
 }
 
@@ -112,12 +113,12 @@ export class LineGroup extends THREE.Group {
       },
       duration: 5000,
     },
+    fade: true,
   };
 
   cellItemParams: CellItemParams = {
     animationSppedArray: [100, 200, 300, 400, 500], // speed of cellItems animation (takes rendomly)
     lifeTime: 5000, // lifetime of cellItems, after what it starts to finalize
-    fade: true, // animate opacity 1 -> 0
   };
 
   lineTextParams: LineTextParams = {
@@ -221,7 +222,9 @@ export class LineGroup extends THREE.Group {
       );
 
       // animate cellItem char switching
-      const fadeSpeed = this.cellItemParams.lifeTime; //null;
+      const fadeSpeed = (this.lineGroupParams.fade) 
+        ? this.cellItemParams.lifeTime
+        : null;
       cellItem.animate(switchingSpeed, fadeSpeed);
 
       index++;
@@ -318,7 +321,7 @@ export class LineGroup extends THREE.Group {
     const size = this.shared.textStyleParams.size;
     return {
       x: 0,
-      y: -(size * index) - (size / 4) * index, // 4 - space % textSize
+      y: - (size * index) - (size / 4) * index, // 4 - space % textSize
       z: 0,
     };
   }

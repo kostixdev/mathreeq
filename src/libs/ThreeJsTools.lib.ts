@@ -8,7 +8,7 @@ import {Intervaq} from 'intervaq';
  */
 
 /**
- * Idntknw why
+ * Simplify THREE.Vector3 to coordinates only Object
  */
 export type CoordsXYZ = {
   x: number;

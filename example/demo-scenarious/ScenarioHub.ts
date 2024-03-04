@@ -1,11 +1,10 @@
 import { MathreeqScenario } from "../../src/classes/MathreeqScenario";
 import { BasicScenario } from "./scenarious/BasicScenario";
-import { TagsScenario } from "./scenarious/TagsScenario";
 
 
 
 // #TODO: WTF??? generics stuff. refac.
-type ScenarioType = BasicScenario | TagsScenario;
+type ScenarioType = BasicScenario;// | TagsScenario;
 
 
 

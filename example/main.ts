@@ -19,7 +19,6 @@ import { HoverDetector } from '../src/classes/HoverDetector';
 
 import { ScenarioHub } from './demo-scenarious/ScenarioHub';
 import { BasicScenario } from './demo-scenarious/scenarious/BasicScenario';
-import { TagsScenario } from './demo-scenarious/scenarious/TagsScenario';
 
 
 
@@ -264,10 +263,24 @@ const disappearOptions = {
   },
 };
 
-// - - scenarious stuff
-const mathreeqScenario = {
+// - - mathreeq scenarious stuff
+const mathreeqActionsOptions = {
   scenario: 'off',
-  delay: 150,
+  delayMs: 150,
+  renderTags: false,
+  clickOnTags: false,
+  paused: false,
+  lineGroupSizeMin: 20,
+  lineGroupSizeMax: 80,
+  lineGroupAppendSpeedMin: 10,
+  lineGroupAppendSpeedMax: 100,
+  lineGroupFade: true,
+  lineGroupMove: true,
+  lineGroupMoveDirection: 'zAxis',
+  lineGroupMoveBackward: false,
+  lineGroupMoveDurationMsMin: 2000,
+  lineGroupMoveDurationMsMax: 7000,
+  cellItemLifetimeMs: 2000,
 };
 
 
@@ -416,21 +429,26 @@ const initMathreeqScenarious = (): void => {
   scenarioHub = new ScenarioHub();
 
   const basicScenario = new BasicScenario('basic', MATHREEQ, {
-    delayMs: mathreeqScenario.delay,
+    delayMs: mathreeqActionsOptions.delayMs,
+    tags: tagsArr,
+    renderTags: mathreeqActionsOptions.renderTags,
+    clickOnTags: mathreeqActionsOptions.clickOnTags,
     areaToolAppear: areaToolAppear,
     areaToolDisappear: areaToolDisappear,
-    areaPointStep: textStyleParams.size
+    areaPointStep: textStyleParams.size,
+    lineGroupSizeMin: mathreeqActionsOptions.lineGroupSizeMin,
+    lineGroupSizeMax: mathreeqActionsOptions.lineGroupSizeMax,
+    lineGroupAppendSpeedMin: mathreeqActionsOptions.lineGroupAppendSpeedMin,
+    lineGroupAppendSpeedMax: mathreeqActionsOptions.lineGroupAppendSpeedMax,
+    lineGroupFade: mathreeqActionsOptions.lineGroupFade,
+    lineGroupMove: mathreeqActionsOptions.lineGroupMove,
+    lineGroupMoveDirection: mathreeqActionsOptions.lineGroupMoveDirection,
+    lineGroupMoveBackward: mathreeqActionsOptions.lineGroupMoveBackward,
+    lineGroupMoveDurationMsMin: mathreeqActionsOptions.lineGroupMoveDurationMsMin,
+    lineGroupMoveDurationMsMax: mathreeqActionsOptions.lineGroupMoveDurationMsMax,
+    cellItemLifetimeMs: mathreeqActionsOptions.cellItemLifetimeMs,
   });
   scenarioHub.registerScenario(basicScenario);
-
-  const tagsScenario = new TagsScenario('tags', MATHREEQ, {
-    delayMs: mathreeqScenario.delay,
-    tags: tagsArr,
-    areaToolAppear: areaToolAppear,
-    areaToolDisappear: areaToolDisappear,
-    areaPointStep: textStyleParams.size
-  });
-  scenarioHub.registerScenario(tagsScenario);
 }
 
 
@@ -481,16 +499,15 @@ function GUI_addFolder_mathreeqFolder(open: boolean) {
   const scenarious = [
     'off',
     'basic',
-    // 'basicStopMooving',
-    // 'basicLineByLine',
-    // 'basicLineScreen',
-    'tags',
-    // 'tagsStopMooving',
-    // 'tagsHoverClick',
-    // 'tagsLineByLine'
+  ];
+  const moveDirections = [
+    'xAxis',
+    'yAxis',
+    'zAxis',
+    'strict'
   ];
 
-  mathreeqFolder.add(mathreeqScenario, 'scenario', scenarious).name('scenario').onChange(function(value: string){
+  mathreeqFolder.add(mathreeqActionsOptions, 'scenario', scenarious).name('scenario').onChange(function(value: string){
     switch(value) {
       case 'off': {
         scenarioHub.stopScenario();
@@ -509,8 +526,58 @@ function GUI_addFolder_mathreeqFolder(open: boolean) {
       }
     }
   });
-  mathreeqFolder.add(mathreeqScenario, 'delay', 10, 500, 1).name('delayMs').onChange(function(value: number){
+  mathreeqFolder.add(mathreeqActionsOptions, 'delayMs', 10, 500, 1).name('delayMs').onChange(function(value: number){
     scenarioHub.setScenarioOption('delayMs', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'paused').name('pause').onChange(function(value: boolean){
+    //#TODO: refac mathreeq pause functionality to strict. somehow.
+    if (value) {
+      MATHREEQ.intervaq.pauseProcessing();
+      MATHREEQ._onVisibilityChange(false);
+    } else {
+      MATHREEQ.intervaq.continueProcessing();
+      MATHREEQ._onVisibilityChange(true);
+    }
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupSizeMin', 10, 50, 1).name('lineGroupSizeMin').onChange(function(value: number){
+    scenarioHub.setScenarioOption('lineGroupSizeMin', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupSizeMax', 51, 100, 1).name('lineGroupSizeMax').onChange(function(value: number){
+    scenarioHub.setScenarioOption('lineGroupSizeMax', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupAppendSpeedMin', 10, 50, 1).name('lineGroupAppendSpeedMin').onChange(function(value: number){
+    scenarioHub.setScenarioOption('lineGroupAppendSpeedMin', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupAppendSpeedMax', 51, 100, 1).name('lineGroupAppendSpeedMax').onChange(function(value: number){
+    scenarioHub.setScenarioOption('lineGroupAppendSpeedMax', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupFade').name('lineGroupFade').onChange(function(value: boolean){
+    scenarioHub.setScenarioOption('lineGroupFade', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupMove').name('lineGroupMove').onChange(function(value: boolean){
+    scenarioHub.setScenarioOption('lineGroupMove', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupMoveDirection', moveDirections).name('lineGroupMoveDirection').onChange(function(value: string){
+    scenarioHub.setScenarioOption('lineGroupMoveDirection', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupMoveBackward').name('lineGroupMoveBackward').onChange(function(value: boolean){
+    scenarioHub.setScenarioOption('lineGroupMoveBackward', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupMoveDurationMsMin', 500, 2500, 10).name('lineGroupMoveDurationMsMin').onChange(function(value: number){
+    scenarioHub.setScenarioOption('lineGroupMoveDurationMsMin', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'lineGroupMoveDurationMsMax', 2510, 10000, 10).name('lineGroupMoveDurationMsMax').onChange(function(value: number){
+    scenarioHub.setScenarioOption('lineGroupMoveDurationMsMax', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'cellItemLifetimeMs', 1000, 5000, 10).name('cellItemLifetimeMs').onChange(function(value: number){
+    scenarioHub.setScenarioOption('cellItemLifetimeMs', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'renderTags').name('renderTags').onChange(function(value: boolean){
+    scenarioHub.setScenarioOption('renderTags', value, true);
+  });
+  mathreeqFolder.add(mathreeqActionsOptions, 'clickOnTags').name('clickOnTags').onChange(function(value: boolean){
+    (value) ? intersectedHoverDetectorEnabled = true : intersectedHoverDetectorEnabled = false;
+    scenarioHub.setScenarioOption('clickOnTags', value, true);
   });
 
   (open) 
@@ -652,7 +719,7 @@ const mathreqReady = new Promise((resolve, reject) => {
     if(ttfLoaded){
       mathreeqFont = new Font(ttfLoaded);
       // - MATHREEQ
-      const mathreeqOptions: MathreeqOptions = {
+      const mathreeqActionsOptions: MathreeqOptions = {
         scene: scene,
         mixers: mixers,
         hoverDetectors: hoverDetectors,
@@ -662,7 +729,7 @@ const mathreqReady = new Promise((resolve, reject) => {
         baseChars: baseChars,
         textChars: textChars,
       }
-      MATHREEQ = new Mathreeq(mathreeqOptions);
+      MATHREEQ = new Mathreeq(mathreeqActionsOptions);
       // - listeners
       //this.addEventListeners();
       resolve(true);
@@ -879,6 +946,7 @@ function render() {
 
   const delta = clock.getDelta();
 
+  // @TODO: do smtn to pause correctly
   mixers.forEach((mixer) => mixer.update(delta));
 
   if (intersectedHoverDetectorEnabled) {

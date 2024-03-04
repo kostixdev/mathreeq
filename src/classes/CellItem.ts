@@ -10,7 +10,6 @@ import {Interval} from 'intervaq';
 export interface CellItemParams {
   animationSppedArray: number[];
   lifeTime: number;
-  fade: boolean;
 }
 
 export interface CellItemOptions {
